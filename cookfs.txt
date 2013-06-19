@@ -1,0 +1,26 @@
+uniform sampler2D tex;
+uniform vec4 ambient;
+uniform vec4 DiffuseLightColor;
+uniform vec4 SpecularLightColor;
+varying float NdotL, NdotH, NdotV, VdotH ;
+float diff=0.1;
+float spec=1.0;
+void main(void){  
+    float m = 0.6;
+    float f0 = 0.9;
+
+    float Fresnel = f0 + (1.0 - f0) * pow((1.0 - VdotH), 5.0);
+    float Droughness = (pow(NdotH, 2.0)-1.0) / (m * m * pow(NdotH,.0)); 
+    float Drough = (1.0 / m * m * pow(NdotH,4.0)) * exp(Droughness);
+    float G1 = (2.0 * NdotH * NdotL) / VdotH;
+    float G2 = (2.0 * NdotH * NdotV) / VdotH;
+    float Geometric= min(1.0, min(G1, G2));
+
+    float Rs = (Fresnel * Drough * Geometric) / (NdotV * NdotL);
+
+    vec3 diffuse = diff * vec3(DiffuseLightColor) * NdotL;
+    vec3 specular = spec * vec3(SpecularLightColor) * Rs;
+
+    vec4 Color = vec4((diffuse + specular),1.0); 
+    gl_FragColor = Color;
+}

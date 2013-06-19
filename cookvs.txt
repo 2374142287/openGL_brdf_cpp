@@ -1,0 +1,18 @@
+uniform vec3 lightposition;
+uniform vec3 eyeposition;
+varying float  NdotL, NdotH, NdotV, VdotH ;
+void main(void){
+
+    vec3 objPosition = vec3 (gl_ModelViewMatrix * gl_Vertex);
+    vec3 Normal = normalize (gl_NormalMatrix * gl_Normal);
+    vec3 LightDir = normalize (lightposition - objPosition);
+    vec3 EyeDir = normalize (eyeposition - objPosition);
+    vec3 HalfVec = normalize (LightDir + EyeDir);
+
+    NdotL = max(dot(Normal, LightDir), 0.0);
+    NdotH = max(dot(Normal, HalfVec), 0.0);
+    NdotV = max(dot(Normal, EyeDir), 0.0);
+    VdotH = max(dot(EyeDir, HalfVec), 0.0);
+
+    gl_Position = ftransform();
+}
